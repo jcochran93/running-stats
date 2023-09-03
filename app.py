@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return redirect("/strava")
-   # return 'Hello, World! 1234'
+    #return redirect("/strava")
+   return 'Hello, World! 1234'
 
 @app.route('/strava')
 def strava():
