@@ -9,7 +9,7 @@ def hello():
 
 @app.route('/authorization')
 def auth():
-    return redirect("/")
+    return redirect("https://www.strava.com/oauth/authorize")
 
 if __name__ == '__main__':
     app.run()
