@@ -1,1 +1,6 @@
+StravaPythonClient/
+*.png
+*.secret
+strava_tokens.json
+stravalib.ipynb
 venv/
