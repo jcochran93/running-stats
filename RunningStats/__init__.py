@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 try:
     SESSION_SECRET = open('session.secret').read().strip()
 except:
-    print("not found")
-    
+    SESSION_SECRET = os.getenv("SESSION_SECRET")
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SESSION_SECRET
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
