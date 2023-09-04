@@ -23,11 +23,15 @@ loginManager.login_view = "userLogin"
 import pickle
 import time
 from functions.StravaStats import StravaStats
+import os
 
 client = Client()
 
-MY_STRAVA_CLIENT_ID, MY_STRAVA_CLIENT_SECRET = open('client.secret').read().strip().split(',')
-SESSION_SECRET = open('session.secret').read().strip()
+try:
+    MY_STRAVA_CLIENT_ID, MY_STRAVA_CLIENT_SECRET = open('client.secret').read().strip().split(',')
+except:
+    MY_STRAVA_CLIENT_ID = os.getenv("MY_STRAVA_CLIENT_ID")
+    MY_STRAVA_CLIENT_SECRET = os.getenv("MY_STRAVA_CLIENT_SECRET")
 
 @loginManager.user_loader
 def load_user(user_id):
