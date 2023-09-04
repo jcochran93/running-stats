@@ -4,3 +4,4 @@ StravaPythonClient/
 strava_tokens.json
 stravalib.ipynb
 venv/
+*.ipynb

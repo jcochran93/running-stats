@@ -1,0 +1,45 @@
+body {
+    margin: 0;
+  }
+  
+  *, *::before, *::after {
+    box-sizing: border-box;
+    
+  }
+
+
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    background-color: rgb(255,251,234);
+}
+
+.window {
+    display: flex;
+    justify-content: center;
+
+    
+}
+
+
+.main-login, .pet-window {
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  border-style: solid;
+  border-radius: 5px;
+    
+}
+
+.login {
+
+  padding-right: 1rem;
+
+}
+
+.text {
+  text-align: center;
+}
+
+a {
+  justify-items: center;
+}

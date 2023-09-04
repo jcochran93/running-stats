@@ -1,0 +1,212 @@
+body {
+    margin: 0;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  :root {
+    --light-gray: rgb(164, 164, 164);
+    --med-gray: rgb(124, 124, 124);
+    --dark-gray: rgb(52, 57, 61);
+    --entry-color: rgba(247, 130, 133, 1);
+    --item-color: rgba(247, 130, 133, 0.5);
+    --progress-title: rgba(99, 86, 114, 1);
+    --progress-content: rgba(99, 86, 114, 0.5);
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+    background-color: rgb(255, 251, 234);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    font-size: 1rem;
+    box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.4);
+    background-color: rgba(167, 239, 231, 1);
+    z-index: 10;
+  }
+  
+  .header a {
+    padding-right: 1em;
+    text-decoration: none;
+  }
+  
+  .head-btns {
+    color: var(--med-gray);
+  }
+  
+  .head-btns:hover {
+    color: var(--dark-gray);
+  }
+  
+  .userName {
+    position: absolute;
+    left: 1px;
+    z-index: 11;
+  }
+  
+  .meal-items {
+    display: inline-block;
+    padding-left: 1rem;
+    min-width: 40%;
+    margin-right: 5px;
+  }
+  
+  .meal-entry {
+    width: 100%;
+  
+    margin-top: 1rem;
+    border-radius: 2px;
+  }
+  
+  .meal-title,
+  .calendar {
+    background-color: var(--entry-color);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.6);
+    max-height: 2rem;
+    display: flex;
+  }
+  
+  .cal-items-content {
+    width: 7rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+    margin-left: 40%;
+  }
+  
+  .calendar {
+    padding: 0.2rem;
+  }
+  
+  h3 {
+    font-weight: normal;
+    margin: 0;
+  }
+  
+  .logged-item {
+    display: flex;
+    background-color: var(--item-color);
+  }
+  
+  .cal-amount {
+    /* margin-left: auto; */
+    margin-right: 2em;
+  }
+  
+  .delete-btn {
+    display: flex;
+    margin-left: auto;
+    margin-right: 0.3em;
+  }
+  /* **************************************************** */
+  
+  /***      Food Entry Area      ***/
+  .calorie-window-container,
+  .weight-window {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 1rem;
+    margin-left: 3rem;
+    width: 20%;
+    background-color: var(--item-color);
+    min-height: 7rem;
+    position: relative;
+  }
+  
+  .calorie-window .head,
+  .weight-window .head {
+    background-color: var(--entry-color);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.6);
+    /* width: 100%; */
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .food-input {
+    margin-left: auto;
+    padding-right: 0.2em;
+  }
+  
+  .food-search {
+    border: none;
+    border-bottom: 1px solid var(--med-gray);
+    background-image: url("../img/search.png");
+    background-position: 5px 3px;
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    max-width: 100%;
+  }
+  
+  .cals {
+    max-width: 5rem;
+  }
+  
+  .daily-total {
+    width: 5rem;
+  }
+  
+  .daily-total > button {
+    background-color: var(--entry-color);
+    border-style: solid;
+  }
+  
+  .daily-total > button:hover {
+    cursor: pointer;
+  }
+  
+  .cal-totals {
+    position: relative;
+    bottom: 0.2rem;
+    padding-top: 3rem;
+  }
+  
+  .total,
+  .budget {
+    display: flex;
+  }
+  
+  .sum {
+    margin-left: auto;
+    margin-right: 1em;
+  }
+  
+  /* ******************************************* */
+  
+  /***     Progress Section    ***/
+  .progress {
+    margin-left: 1rem;
+    margin-top: 4rem;
+    width: 80%;
+    min-height: 25rem;
+    position: relative;
+    border-style: solid;
+    border-color: var(--dark-gray);
+    border-radius: 2px;
+    margin-bottom: 10px;
+    background-color: var(--progress-content);
+  }
+  .progress > h3 {
+    color: var(--light-gray);
+    background-color: var(--progress-title);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.6);
+  }
+  
+  .chart {
+    border-bottom: 1px solid var(--dark-gray);
+    background-color: var(--progress-content);
+  }
+  
