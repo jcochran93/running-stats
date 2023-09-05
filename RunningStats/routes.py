@@ -101,8 +101,8 @@ def index():
 @app.route('/strava')
 def strava():
       
-    url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri='http://127.0.0.1:5000/authorization', scope=['read_all','profile:read_all','activity:read_all','activity:write'])
-    # url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri='https://running-stats-d49636ca3c9f.herokuapp.com/authorization', scope=['read_all','profile:read_all','activity:read_all','activity:write'])
+    # url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri='http://127.0.0.1:5000/authorization', scope=['read_all','profile:read_all','activity:read_all','activity:write'])
+    url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri='https://running-stats-d49636ca3c9f.herokuapp.com/authorization', scope=['read_all','profile:read_all','activity:read_all','activity:write'])
 
     return render_template(
             "strava.html", stravaUrl=url
