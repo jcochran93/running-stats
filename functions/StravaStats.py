@@ -18,7 +18,10 @@ class StravaStats:
         self.runList = self.getRunList()
 
     def getActivities(self):
-        activities = self.client.get_activities(limit=self.numberOfActivities)
+        if (self.numberOfActivities != 0):
+            activities = self.client.get_activities(limit=self.numberOfActivities)
+        else:
+            activities = self.client.get_activities()
 
         activityList = []
         for activity in activities:   
@@ -57,7 +60,7 @@ class StravaStats:
             elif(dayDiff > 1):
                 if count > maxCount:
                     maxCount = count
-                    longestStartDate = currDate.date()
+                    longestStartDate = currDate
                 count = 1
             
         # TODO: Test if this works for continuous streak
