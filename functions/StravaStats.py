@@ -11,11 +11,19 @@ class StravaStats:
     activityList = []
     runList = []
 
+    dailyMilesList = np.array([])
+    dailyDateList = np.array([])
+
+    allStats = {}
+
     def __init__(self, client, numberOfActivities):
         self.client = client
         self.numberOfActivities = numberOfActivities
         self.activityList = self.getActivities()
         self.runList = self.getRunList()
+        self.dailyMilesList = self.getDailyMilesList()
+        self.dailyDateList = self.getDailyDateList()
+        self.allStats = self.getAllStats()
 
     def getActivities(self):
         if (self.numberOfActivities != 0):
@@ -88,24 +96,26 @@ class StravaStats:
                     break
         return count, longestStartDate
 
-
-    # x = np.array([])
-    # y = np.array([])
-
     def toMiles(self, distance):
         dist = str(distance).strip(" meter")
         dist = float(dist) / 1609
         return dist 
 
+    def getDailyMilesList(self):
+        y = np.array([])
+        for run in self.runList:
+            y = np.append(y, self.toMiles(run.distance))
+        return y
 
-    # # for run in activityList:
-    # #     y = np.append(y, toMiles(run.distance))
-    # #     x = np.append(x, toDatetime(run.start_date_local))
-
+    def getDailyDateList(self):
+        x = np.array([])
+        for run in self.runList:
+            x = np.append(x, run.start_date_local)
+        return x
 
     def minRun(self):
     
-        runList = self.runList
+        runList = self.dailyMilesList
         
         minRun = 1000000
         for run in runList:
@@ -114,7 +124,7 @@ class StravaStats:
         return minRun
 
     def modeRun(self):
-        runList = self.runList
+        runList = self.dailyMilesList
         
         runs = np.array([])
         for run in runList:
@@ -130,15 +140,15 @@ class StravaStats:
         return time
 
     def totalMiles(self):
-        runList = self.runList
+        runList = self.dailyMilesList
         
         count = 0
         for run in runList:
-            count += self.toMiles(run.distance)
+            count += run
         return count
 
     def averagePace(self):
-        runList = self.runList
+        runList = self.dailyMilesList
         
         pace = (self.totalElapsedTimeInSeconds() / 60) / self.totalMiles()
         floorPace = math.floor(pace)
@@ -146,35 +156,39 @@ class StravaStats:
 
         return f'{floorPace}:{math.floor(seconds)}'
 
+    def getAllStats(self):
+        allStats = {}
+        allStats["avg_pace"] = self.averagePace()
+        allStats["streak"] = self.longestRunStreak()[0]
+        allStats["shortest"] = round(self.minRun(), 2)
+        allStats["longest"] = round(self.dailyMilesList.max(),2)
+        allStats["average"] = round(np.average(self.dailyMilesList), 2)
+        allStats["median"] = round(np.median(self.dailyMilesList), 2)
+        allStats["mode"] = self.modeRun()[0]
+        allStats["modeOccurance"] = self.modeRun()[1]
+        allStats["startDate"] = self.dailyDateList.min().strftime("%d, %b %Y")
+        allStats["endDate"] = self.dailyDateList.max().strftime("%d, %b %Y")
 
+        totaldays = (self.dailyDateList.max()-self.dailyDateList.min()).days
 
-    # totaldays = (x.max()-x.min()).days
+        totalSeconds = round(self.totalElapsedTimeInSeconds())
+        totalMinutes = round(totalSeconds / 60, 2)
+        totalHours = round(totalSeconds/3600, 2)
 
-    # totalSeconds = round(totalElapsedTimeInSeconds(activityList))
-    # totalMinutes = round(totalSeconds / 60, 2)
-    # totalHours = round(totalSeconds/3600, 2)
+        allStats["totalDays"] = totaldays
+        allStats["totalRunningDays"] = len(self.dailyDateList)
+        allStats["percentDays"] = round(len(self.dailyDateList)/ totaldays, 2)* 100
+        allStats["totalSeconds"] = totalSeconds
+        allStats["totalMinutes"] = totalMinutes
+        allStats["totalHours"] = totalHours
+        allStats["totalOfDaysRunning"] = round(totalHours / 24, 2)
+        allStats["totalMiles"] = round(self.totalMiles(), 2)
 
-    # print(f'The shortest run: {round(minRun(y), 2)}')
-    # print(f'The longest run: {round(y.max(),2)}')
-    # print(f'Average run: {round(np.average(y), 2)}')
-    # print(f'Median run: {round(np.median(y), 2)}')
-    # print(f'Most common distance (rounded to a mile): {modeRun(y)[0]} with {modeRun(y)[1]} runs')
-    # print("")
-    # print(f'From {x.min().strftime("%d, %b %Y")} to {x.max().strftime("%d, %b %Y")} ({totaldays} days)')
-    # print(f'You ran {len(x)} days or {round(len(x)/ totaldays, 2)* 100}% of the time.')
-    # print(f'For a total of {totalSeconds} seconds, or {totalMinutes} minutes, or {totalHours} hours, or {round(totalHours / 24, 2)} days')
-    # print("")
-    # print(f'During that time you ran a total of {round(totalMiles(activityList), 2)} miles')
-    # print("")
-    # print(f'Average pace: {averagePace(activityList)} min/mile')
-
-    # runStreak()
-
-
-
-
-
-    # # # %%
+        return allStats
+                                       
+        
+                                           
+                                           # # # %%
     # # plt.figure(figsize=(50,8))
     # # plt.scatter(x,y)
     # # plt.show()

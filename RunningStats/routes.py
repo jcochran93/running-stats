@@ -141,17 +141,45 @@ def dashboard():
         #activityList = strava.getActivities(client)
 
         strava = StravaStats(newClient, 0)
-        streak = strava.longestRunStreak()[0]
-        avg_pace = strava.averagePace()
-        
+
+        allStats = strava.allStats
+
+        streak = allStats["streak"]
+        avg_pace = allStats["avg_pace"]
+        shortest = allStats["shortest"]
+        longest = allStats["longest"]
+        average = allStats["average"]
+        median = allStats["median"]
+        mode = allStats["mode"]
+        modeOccurance = allStats["modeOccurance"]
+        startDate = allStats["startDate"]
+        endDate = allStats["endDate"]
+        totalDays = allStats["totalDays"]
+        totalRunningDays = allStats["totalRunningDays"]
+        percentDays = allStats["percentDays"]
+        totalSeconds = allStats["totalSeconds"]
+        totalMinutes = allStats["totalMinutes"]
+        totalHours = allStats["totalHours"]
+        totalOfDaysRunning = allStats["totalOfDaysRunning"]
+        totalMiles = allStats["totalMiles"]
+ 
         athlete = newClient.get_athlete()
         nameString = f'{athlete.firstname} {athlete.lastname}'
 
         
         return render_template(
-            "dashboard.html", average_pace=avg_pace, streak=streak, name=nameString
+            "dashboard.html", average_pace=avg_pace, 
+            streak=streak, 
+            name=nameString,
+            shortest=shortest, 
+            longest=longest, 
+            average=average, 
+            median=median, mode=mode, 
+            modeOccurance=modeOccurance, startDate=startDate, endDate=endDate, 
+            totalDays=totalDays, totalRunningDays=totalRunningDays, percentDays=percentDays, 
+            totalSeconds=totalSeconds, totalMinutes=totalMinutes, totalHours=totalHours, 
+            totalOfDaysRunning=totalOfDaysRunning, totalMiles=totalMiles
         )
-
     
     except:
         return ("Sorry we've encountered an error.")

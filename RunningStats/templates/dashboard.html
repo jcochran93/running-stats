@@ -10,10 +10,27 @@
 
 <h3> {{ name }} </h3>
 
+<p>
 
+The longest run streak is {{ streak }}. <br>
 
-The longest run streak is {{ streak }}.
-The average pace is {{ average_pace }}.
+The shortest run: {{ shortest }}
+<br>
+The longest run: {{ longest }}
+<br>
+Average run: {{ average }}
+<br>
+Median run: {{ median }}
+<br>
+Most common distance (rounded to a mile): {{ mode }} with {{ modeOccurance }} runs
+<br>
 
-
+From {{ startDate }} to {{ endDate }} ({{ totalDays }} days)<br>
+You ran {{ totalRunningDays }} out of the {{ totalDays }} total days.<br>
+For a total of {{ totalSeconds }} seconds, or {{ totalMinutes }} minutes, or {{ totalHours }} hours, or {{ totalOfDaysRunning }} days.<br>
+<br>
+During that time you ran a total of {{ totalMiles }} miles
+<br><br>
+Average pace: {{ average_pace }} min/mile
+</p>
 {% endblock %}
