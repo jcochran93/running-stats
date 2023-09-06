@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 from scipy import stats
 import math
@@ -185,15 +184,22 @@ class StravaStats:
         allStats["totalMiles"] = round(self.totalMiles(), 2)
 
         return allStats
-                                       
-        
-                                           
-                                           # # # %%
-    # # plt.figure(figsize=(50,8))
-    # # plt.scatter(x,y)
-    # # plt.show()
+    
+    def summaryString(self):
+        allstats = self.allStats
 
-    # # # %%
+        summary = []
 
-
-
+        summary.append( (f'The longest run streak is {allstats["streak"]}.'))
+        summary.append( (f'The shortest run: {allstats["shortest"]}'))
+        summary.append( (f'The longest run: {allstats["longest"]}'))
+        summary.append( (f'Average run: {allstats["average"]}'))
+        summary.append( (f'Median run: {allstats["median"]}'))
+        summary.append( (f'Most common distance (rounded to a mile): {allstats["mode"]} with {allstats["modeOccurance"]} runs'))
+        summary.append( (f'From {allstats["startDate"]} to {allstats["endDate"]} ({allstats["totalDays"]}'))
+        summary.append( (f'You ran {allstats["totalRunningDays"]} days or {allstats["percentDays"]}% of the time.'))
+        summary.append( (f'For a total of {allstats["totalSeconds"]} seconds, or {allstats["totalMinutes"]} minutes, or {allstats["totalHours"]} hours, or {allstats["totalOfDaysRunning"]} days'))
+        summary.append( (f'During that time you ran a total of {allstats["totalMiles"]} miles'))
+        summary.append( (f'Average pace: {allstats["avg_pace"]} min/mile'))
+        # summary += "<br>"
+        return summary

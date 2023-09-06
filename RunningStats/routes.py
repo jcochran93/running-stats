@@ -10,22 +10,26 @@ from flask_login import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from RunningStats import app, db
+from RunningStats import app, db, app_dash
 from RunningStats.forms import RegisterForm, LoginForm
-from RunningStats.models import UserInfo
+from RunningStats.models import UserInfo, Token
 
 from stravalib.client import Client
+
+import pickle
+import time
+from functions.StravaStats import StravaStats
+from RunningStats.dashboard import plotlyDashboard
+import os
+
 
 loginManager = LoginManager()
 loginManager.init_app(app)
 loginManager.login_view = "userLogin"
 
-import pickle
-import time
-from functions.StravaStats import StravaStats
-import os
-
 client = Client()
+
+accessToken = ""
 
 try:
     MY_STRAVA_CLIENT_ID, MY_STRAVA_CLIENT_SECRET = open('client.secret').read().strip().split(',')
@@ -47,9 +51,11 @@ def userLogin():
     if form.validate_on_submit():
         user = UserInfo.query.filter_by(username=form.username.data).first_or_404()
 
+        session['user'] = user.id
+
         if check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("index"))
         else:
             return "Incorrect Password"
 
@@ -94,6 +100,7 @@ def logout():
 
 
 @app.route('/')
+@login_required
 def index():
     # return ("Hello world!")
     return render_template("index.html")
@@ -123,10 +130,31 @@ def auth():
         session['access_token'] = token_response['access_token']
         session['refresh_token'] = token_response['refresh_token']
 
-        return redirect("/dashboard")
+        token_info = Token(id=int(session['user']), access_token=session['access_token'], 
+                           refresh_token=session['refresh_token'])
+        old_token = Token.query.filter_by(id=int(session['user'])).first_or_404()
+
+        try:
+            db.session.delete(old_token)
+            db.session.commit()
+        except:
+            pass 
+        try:
+            db.session.add(token_info)
+            db.session.commit()
+            return redirect(url_for("render_dashboard"))
+        except:
+            return "There was an error opening the dashboard."
+    
 
     # return redirect("/dashboard")
     # return redirect("https://www.strava.com/oauth/authorize")
+
+
+@app.route('/plotly_dashboard') 
+def render_dashboard():
+    plotlyDashboard(session["access_token"])
+    return redirect('/dash')
 
 
 @app.route('/dashboard')
@@ -134,8 +162,8 @@ def dashboard():
 
     try:
 
+        return "404"
         CLIENT_ACCESS = session['access_token']
-
         newClient = Client(access_token=CLIENT_ACCESS)
 
         #activityList = strava.getActivities(client)
@@ -168,13 +196,8 @@ def dashboard():
 
         
         return render_template(
-            "dashboard.html", average_pace=avg_pace, 
-            streak=streak, 
-            name=nameString,
-            shortest=shortest, 
-            longest=longest, 
-            average=average, 
-            median=median, mode=mode, 
+            "dashboard.html", average_pace=avg_pace, streak=streak, name=nameString,
+            shortest=shortest, longest=longest, average=average, median=median, mode=mode, 
             modeOccurance=modeOccurance, startDate=startDate, endDate=endDate, 
             totalDays=totalDays, totalRunningDays=totalRunningDays, percentDays=percentDays, 
             totalSeconds=totalSeconds, totalMinutes=totalMinutes, totalHours=totalHours, 
