@@ -100,7 +100,6 @@ def logout():
 
 
 @app.route('/')
-@login_required
 def index():
     # return ("Hello world!")
     return render_template("index.html")
@@ -133,6 +132,8 @@ def auth():
         token_info = Token(id=int(session['user']), access_token=session['access_token'], 
                            refresh_token=session['refresh_token'])
         old_token = Token.query.filter_by(id=int(session['user'])).first_or_404()
+
+        return redirect(url_for("render_dashboard"))
 
         try:
             db.session.delete(old_token)
