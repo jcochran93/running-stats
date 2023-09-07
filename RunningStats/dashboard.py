@@ -27,7 +27,7 @@ def plotlyDashboard(accessToken):
     summaryStringList = strava.summaryString()
 
     app_dash.layout = html.Div([
-        html.H2(html.Div(children='Hello test'+ nameString),),
+        html.H2(html.Div(children='Hello '+ nameString),),
         html.Div([
         "Date Range: ",
         dcc.Input(id='startDate', value=dates.min().date(), type='date'),
