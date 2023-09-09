@@ -9,6 +9,8 @@ from RunningStats.models import UserInfo, Token
 summaryStringList = []
 dataset = pd.DataFrame()
 
+app_dash.layout = html.Div(children="Loading...")
+
 def plotlyDashboard(accessToken):
     CLIENT_ACCESS = accessToken
 
