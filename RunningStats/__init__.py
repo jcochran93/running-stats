@@ -11,7 +11,11 @@ except:
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SESSION_SECRET
+# try:
+#     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+# except:
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+
 db = SQLAlchemy(app)
 
 app_dash = Dash(__name__, server=app, url_base_pathname='/dash/')

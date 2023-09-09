@@ -9,22 +9,27 @@ from RunningStats.models import UserInfo, Token
 summaryStringList = []
 dataset = pd.DataFrame()
 
+strava = None
+
+app_dash.layout = html.Div(children="Loading...")
+
 def plotlyDashboard(accessToken):
     CLIENT_ACCESS = accessToken
 
     newClient = Client(access_token=CLIENT_ACCESS)
-    strava = StravaStats(newClient, 0)
+    strava = StravaStats(newClient, 200)
 
     athlete = newClient.get_athlete()
     nameString = f'{athlete.firstname} {athlete.lastname}'
 
-    allStats = strava.allStats
+    # allStats = strava.allStats
 
     dates = strava.dailyDateList
-    miles = strava.dailyMilesList
-    dataset = pd.DataFrame({'dates': dates, 'miles': miles}, columns=['dates', 'miles'])
+    # miles = strava.dailyMilesList
+    # dataset = pd.DataFrame({'dates': dates, 'miles': miles}, columns=['dates', 'miles'])
 
-    summaryStringList = strava.summaryString()
+    earliestDate = dates.min().date()
+    latestDate = dates.max().date()
 
     app_dash.layout = html.Div([
         html.H2(html.Div(children='Hello '+ nameString),),
@@ -33,7 +38,7 @@ def plotlyDashboard(accessToken):
         dcc.Input(id='startDate', value=dates.min().date(), type='date'),
         dcc.Input(id='endDate', value=dates.max().date(), type='date')
     ]), 
-        html.Div(id="statSummary", children=getSummary(summaryStringList, dataset))
+        html.Div(id="statSummary", children=getSummary(CLIENT_ACCESS, earliestDate, latestDate))
     ])
 
 
@@ -41,14 +46,24 @@ def plotlyDashboard(accessToken):
 
 @callback(
     Output(component_id='statSummary', component_property='children'),
-    Input(component_id='my-input', component_property='value'),
+    Input(component_id='startDate', component_property='value'),
     Input('endDate', 'value')
 )
 def update_output_div(start_date, end_date):
     
-    return f'Output'
+    return getSummary(strava, start_date, end_date)
 
-def getSummary(summaryStringList, dataset):
+def getSummary(token, startDate, endDate):
+
+    newClient = Client(access_token=token)
+    stravaClient = StravaStats(newClient, 200)
+
+    summaryStringList = stravaClient.summaryStringForRange(startDate, endDate)
+    
+    dates = stravaClient.getDailyDateList(stravaClient.runList, startDate, endDate)
+    miles = stravaClient.getDailyMilesList(stravaClient.runList, startDate, endDate)
+    dataset = pd.DataFrame({'dates': dates, 'miles': miles}, columns=['dates', 'miles'])
+
     return html.Div([
         html.Div(children=summaryStringList[0]),
         html.Div(children=summaryStringList[1]),
