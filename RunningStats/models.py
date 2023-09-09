@@ -16,8 +16,8 @@ class Token(db.Model):
 class RunningData(db.Model):
     id = db.Column(db.Integer, nullable=True, primary_key=True)
     name = db.Column(db.String(100))
-    userId = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False)
-    distance = db.Column(db.Integer, nullable=False, default = 0)
+    athleteId = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False)
+    distance = db.Column(db.Float, nullable=False, default = 0)
     startDate = db.Column(db.DateTime, nullable=False)
     movingTime = db.Column(db.Float, nullable=False)
 

@@ -12,8 +12,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from RunningStats import app, db, app_dash
 from RunningStats.forms import RegisterForm, LoginForm
-# from RunningStats.models import UserInfo, Token
-from RunningStats.models import UserInfo
+from RunningStats.models import UserInfo, Token
+# from RunningStats.models import UserInfo
 
 from stravalib.client import Client
 
@@ -127,12 +127,14 @@ def auth():
 
         token_response = client.exchange_code_for_token(client_id=MY_STRAVA_CLIENT_ID, client_secret=MY_STRAVA_CLIENT_SECRET, code=CODE)
 
+        session["userId"] = client.get_athlete().id # Does this exhaust the token?
+
         session['access_token'] = token_response['access_token']
         session['refresh_token'] = token_response['refresh_token']
 
-        # token_info = Token(id=int(session['user']), access_token=session['access_token'], 
-                        #    refresh_token=session['refresh_token'])
-        # old_token = Token.query.filter_by(id=int(session['user'])).first_or_404()
+        token_info = Token(id=int(session['user']), access_token=session['access_token'], 
+                           refresh_token=session['refresh_token'])
+        old_token = Token.query.filter_by(id=int(session['user'])).first_or_404()
 
         return redirect(url_for("render_dashboard"))
 
@@ -155,7 +157,7 @@ def auth():
 
 @app.route('/plotly_dashboard') 
 def render_dashboard():
-    plotlyDashboard(session["access_token"])
+    plotlyDashboard(session["access_token"], session["userId"])
     return redirect('/dash')
 
 

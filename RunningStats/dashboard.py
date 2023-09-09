@@ -4,27 +4,40 @@ from dash import html, dcc, Input, Output, callback
 import plotly.express as px
 from stravalib import Client
 from functions.StravaStats import StravaStats
-from RunningStats.models import UserInfo, Token
+from RunningStats.models import UserInfo, Token, RunningData
+from sqlalchemy import desc
+from datetime import datetime, timedelta, date
+from RunningStats import db
 
 summaryStringList = []
 dataset = pd.DataFrame()
 
-strava = None
+stravaClient = None
+
+app_dash.config.suppress_callback_exceptions = True
 
 app_dash.layout = html.Div(children="Loading...")
 
-def plotlyDashboard(accessToken):
+def plotlyDashboard(accessToken, athleteId):
     CLIENT_ACCESS = accessToken
 
     newClient = Client(access_token=CLIENT_ACCESS)
-    strava = StravaStats(newClient, 200)
+    earliestDate = checkDbForActivityData(athleteId)
+
+    # if( earliestDate == date.min):
+    stravaClient = StravaStats(newClient, earliestDate)
+    addActivitiesToDb(newClient, earliestDate)
+    activities  = getActivitiesFromDb(athleteId)
+    activities = [activity for activity in activities] 
+
+    stravaStats = StravaStats(activities)
 
     athlete = newClient.get_athlete()
     nameString = f'{athlete.firstname} {athlete.lastname}'
 
     # allStats = strava.allStats
 
-    dates = strava.dailyDateList
+    dates = stravaClient.dailyDateList
     # miles = strava.dailyMilesList
     # dataset = pd.DataFrame({'dates': dates, 'miles': miles}, columns=['dates', 'miles'])
 
@@ -38,7 +51,7 @@ def plotlyDashboard(accessToken):
         dcc.Input(id='startDate', value=dates.min().date(), type='date'),
         dcc.Input(id='endDate', value=dates.max().date(), type='date')
     ]), 
-        html.Div(id="statSummary", children=getSummary(CLIENT_ACCESS, earliestDate, latestDate))
+        html.Div(id="statSummary", children=getSummary(earliestDate, latestDate))
     ])
 
 
@@ -51,12 +64,9 @@ def plotlyDashboard(accessToken):
 )
 def update_output_div(start_date, end_date):
     
-    return getSummary(strava, start_date, end_date)
+    return getSummary(start_date, end_date)
 
-def getSummary(token, startDate, endDate):
-
-    newClient = Client(access_token=token)
-    stravaClient = StravaStats(newClient, 200)
+def getSummary(startDate, endDate):
 
     summaryStringList = stravaClient.summaryStringForRange(startDate, endDate)
     
@@ -79,3 +89,43 @@ def getSummary(token, startDate, endDate):
         dcc.Graph(figure=px.scatter(dataset, x='dates', y='miles'))
     ])
 
+def checkDbForActivityData(athleteId):
+    
+    results = RunningData.query.filter_by(athleteId=athleteId).order_by(RunningData.startDate).first_or_404()
+
+    try:
+        earliestDate = results[0]
+    except:
+        earliestDate = date.min
+
+    return earliestDate
+
+def addActivitiesToDb(stravaClient, afterDate):
+
+    activities = stravaClient.get_activities(afterDate)
+
+    for activity in activities:
+
+        dist = str(activity.distance).strip(" meter")
+        dist = float(dist) / 1609.34
+
+        newActivity = RunningData(name=activity.name, athleteId=stravaClient.get_athlete().id, 
+                                  distance=dist, startDate=activity.start_date_local, movingTime=activity.moving_time)
+        try:
+            db.session.add(newActivity)
+            db.session.commit()
+        except:
+            continue
+
+def getActivitiesFromDb(athleteId):
+
+    return RunningData.query.filter_by(athleteId=athleteId).order_by(RunningData.startDate)
+
+
+
+# id = db.Column(db.Integer, nullable=True, primary_key=True)
+#     name = db.Column(db.String(100))
+#     athleteId = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False)
+#     distance = db.Column(db.Integer, nullable=False, default = 0)
+#     startDate = db.Column(db.DateTime, nullable=False)
+#     movingTime = db.Column(db.Float, nullable=False)
