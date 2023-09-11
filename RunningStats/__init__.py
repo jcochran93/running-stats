@@ -3,18 +3,21 @@ from flask_sqlalchemy import SQLAlchemy
 from dash import Dash 
 import os
 
-try:
-    SESSION_SECRET = open('session.secret').read().strip()
-except:
-    SESSION_SECRET = os.getenv("SESSION_SECRET")
+is_prod = os.environ.get('PROD', None)
 
+if is_prod:
+    SESSION_SECRET = os.getenv("SESSION_SECRET")
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    AUTH_URL = 'https://running-stats-d49636ca3c9f.herokuapp.com/authorization'
+else:
+    SESSION_SECRET = open('session.secret').read().strip()
+    DATABASE_URL = "sqlite:///test.db"
+    AUTH_URL = 'http://127.0.0.1:5000/authorization'
+ 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = SESSION_SECRET
-# try:
-#     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-# except:
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 
 db = SQLAlchemy(app)
 

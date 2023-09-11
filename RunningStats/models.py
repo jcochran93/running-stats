@@ -12,13 +12,14 @@ class Token(db.Model):
     id = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False, primary_key=True)
     access_token = db.Column(db.String(100), nullable=False)
     refresh_token = db.Column(db.String(100), nullable=False)
+    expires_at = db.Column(db.Integer, nullable=False)
 
 class RunningData(db.Model):
     id = db.Column(db.Integer, nullable=True, primary_key=True)
     name = db.Column(db.String(100))
-    athleteId = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False)
+    athlete_id = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False)
     distance = db.Column(db.Float, nullable=False, default = 0)
-    startDate = db.Column(db.DateTime, nullable=False)
-    movingTime = db.Column(db.Float, nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False)
+    moving_time = db.Column(db.Float, nullable=False)
 
 
