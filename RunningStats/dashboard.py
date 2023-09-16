@@ -71,7 +71,7 @@ def getActivitiesFromDb(athleteId):
 def plotlyDashboard(accessToken, athlete):
     CLIENT_ACCESS = accessToken
     athleteId = athlete or testAthleteId
-    nameString = "Jfvdfgb"
+    nameString = ""
 
 
     if (athlete != ""):

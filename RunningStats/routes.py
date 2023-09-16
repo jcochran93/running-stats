@@ -100,12 +100,11 @@ def logout():
 
 
 
-@app.route('/')
-def index():
-    # return ("Hello world!")
-    return render_template("index.html")
+# @app.route('/')
+# def index():
+#     return render_template("index.html")
 
-@app.route('/strava')
+@app.route('/')
 def strava():
 
     url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri=AUTH_URL, scope=['read_all','profile:read_all','activity:read_all','activity:write'])
@@ -127,10 +126,11 @@ def auth():
         session['access_token'] = token_response['access_token']
         session['refresh_token'] = token_response['refresh_token']
 
-        token_info = Token(id=int(session['userId']), access_token=session['access_token'], 
+        ## TODO register users for 
+        token_info = Token(id=int(session['userId']), access_token=session['access_token'],
                            refresh_token=session['refresh_token'], expires_at=int(token_response['expires_at']))
         old_token = Token.query.filter_by(id=int(session['userId'])).first()
-
+        
         try:
             db.session.delete(old_token)
             db.session.commit()
@@ -149,13 +149,3 @@ def render_dashboard():
     # checkAuthorization()
     plotlyDashboard(session["access_token"], session["userId"])
     return redirect('/dash')
-
-
-@app.route('/test') 
-def render_test_dash():
-    # checkAuthorization()
-    plotlyDashboard("", "")
-    return redirect('/dash')
-
-# def checkAuthorization():
-#     Token.query.
