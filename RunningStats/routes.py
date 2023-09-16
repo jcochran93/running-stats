@@ -10,10 +10,10 @@ from flask_login import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from RunningStats import app, db, app_dash
+from RunningStats import app, db, app_dash, AUTH_URL
 from RunningStats.forms import RegisterForm, LoginForm
-# from RunningStats.models import UserInfo, Token
-from RunningStats.models import UserInfo
+from RunningStats.models import UserInfo, Token
+# from RunningStats.models import UserInfo
 
 from stravalib.client import Client
 
@@ -100,42 +100,37 @@ def logout():
 
 
 
+# @app.route('/')
+# def index():
+#     return render_template("index.html")
+
 @app.route('/')
-def index():
-    # return ("Hello world!")
-    return render_template("index.html")
-
-@app.route('/strava')
 def strava():
-      
-    # url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri='http://127.0.0.1:5000/authorization', scope=['read_all','profile:read_all','activity:read_all','activity:write'])
-    url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri='https://running-stats-d49636ca3c9f.herokuapp.com/authorization', scope=['read_all','profile:read_all','activity:read_all','activity:write'])
 
+    url = client.authorization_url(client_id=MY_STRAVA_CLIENT_ID, redirect_uri=AUTH_URL, scope=['read_all','profile:read_all','activity:read_all','activity:write'])
+    
     return render_template(
             "strava.html", stravaUrl=url
         )
 
-
-
 @app.route('/authorization', methods=["GET"])
 def auth():
-
+    
     if request.method == "GET":
 
         CODE = request.args.get("code")
-        # CODE = request.args.get('code')
-
         token_response = client.exchange_code_for_token(client_id=MY_STRAVA_CLIENT_ID, client_secret=MY_STRAVA_CLIENT_SECRET, code=CODE)
+
+        session["userId"] = client.get_athlete().id # Does this exhaust the token?
 
         session['access_token'] = token_response['access_token']
         session['refresh_token'] = token_response['refresh_token']
 
-        # token_info = Token(id=int(session['user']), access_token=session['access_token'], 
-                        #    refresh_token=session['refresh_token'])
-        # old_token = Token.query.filter_by(id=int(session['user'])).first_or_404()
-
-        return redirect(url_for("render_dashboard"))
-
+        ## TODO register users for 
+        token_info = Token(id=int(session['userId']), access_token=session['access_token'],
+                           refresh_token=session['refresh_token'], expires_at=int(token_response['expires_at']))
+        old_token = Token.query.filter_by(id=int(session['userId'])).first()
+        
         try:
             db.session.delete(old_token)
             db.session.commit()
@@ -149,62 +144,8 @@ def auth():
             return "There was an error opening the dashboard."
     
 
-    # return redirect("/dashboard")
-    # return redirect("https://www.strava.com/oauth/authorize")
-
-
 @app.route('/plotly_dashboard') 
 def render_dashboard():
-    plotlyDashboard(session["access_token"])
+    # checkAuthorization()
+    plotlyDashboard(session["access_token"], session["userId"])
     return redirect('/dash')
-
-
-@app.route('/dashboard')
-def dashboard():
-
-    try:
-
-        return "404"
-        CLIENT_ACCESS = session['access_token']
-        newClient = Client(access_token=CLIENT_ACCESS)
-
-        #activityList = strava.getActivities(client)
-
-        strava = StravaStats(newClient, 0)
-
-        allStats = strava.allStats
-
-        streak = allStats["streak"]
-        avg_pace = allStats["avg_pace"]
-        shortest = allStats["shortest"]
-        longest = allStats["longest"]
-        average = allStats["average"]
-        median = allStats["median"]
-        mode = allStats["mode"]
-        modeOccurance = allStats["modeOccurance"]
-        startDate = allStats["startDate"]
-        endDate = allStats["endDate"]
-        totalDays = allStats["totalDays"]
-        totalRunningDays = allStats["totalRunningDays"]
-        percentDays = allStats["percentDays"]
-        totalSeconds = allStats["totalSeconds"]
-        totalMinutes = allStats["totalMinutes"]
-        totalHours = allStats["totalHours"]
-        totalOfDaysRunning = allStats["totalOfDaysRunning"]
-        totalMiles = allStats["totalMiles"]
- 
-        athlete = newClient.get_athlete()
-        nameString = f'{athlete.firstname} {athlete.lastname}'
-
-        
-        return render_template(
-            "dashboard.html", average_pace=avg_pace, streak=streak, name=nameString,
-            shortest=shortest, longest=longest, average=average, median=median, mode=mode, 
-            modeOccurance=modeOccurance, startDate=startDate, endDate=endDate, 
-            totalDays=totalDays, totalRunningDays=totalRunningDays, percentDays=percentDays, 
-            totalSeconds=totalSeconds, totalMinutes=totalMinutes, totalHours=totalHours, 
-            totalOfDaysRunning=totalOfDaysRunning, totalMiles=totalMiles
-        )
-    
-    except:
-        return ("Sorry we've encountered an error.")

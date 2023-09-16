@@ -2,14 +2,21 @@
 
 {% block head %}
     <title>Running Stats</title>
-
-
+    <!-- Custom styles for this template -->
+    <link href="{{url_for('.static', filename='css/signin.css')}}" rel="stylesheet">
+  
 {% endblock %}
 
 {% block body %}
+<div  id="body" class="vh-100 text-center">
+    <main class="form-signin">
 
 <h3> Strava verification </h3>
 
-<a href={{ stravaUrl }}>Login through Strava</a>
 
+<a class="btn btn-primary" href={{ stravaUrl }} role="button">Login through Strava</a>
+</main>
+
+<!-- <a href={{ stravaUrl }}>Login through Strava</a> -->
+</div>
 {% endblock %}

@@ -1,28 +1,40 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <title>Document</title>
+
+
+    <title> Log In </title>
+
+    <!-- Custom styles for this template -->
+    <link href="{{url_for('.static', filename='css/signin.css')}}" rel="stylesheet">
+  
+
 {% endblock %}
 
 
 {% block body %}
 
-<div class="window">
-        <div class="main-login">
-            
-            <h2 class="login">Login</h2>
-            <!-- may need to add action -->
-            <form class="login"  method="post" action="">
-
-                {{ form.hidden_tag() }}
-                {{ form.username }}
-                {{ form.password }}
-                {{ form.submit }}
-                
-            </form>
-            <a href="{{ url_for('userRegister') }}" class="text">Register</a>
-        </div>
+    <div  id="body" class="vh-100 text-center">
+    <main class="form-signin">
+    
+      <form  method="post" action="">
+        <img class="mb-4" src="../static/img/logo.png" alt="" width="125" height="125">
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+    
+          {{ form.hidden_tag() }}
+          <div class="form-floating">
+          {{ form.username (class="form-control", id="floatingInput") }}
+          <label for="floatingInput">Username</label>
+          </div>
+          <div class="form-floating pb-4">
+          {{ form.password (class="form-control", id="floatingPassword") }}
+          <label for="floatingPassword">Password</label>
+          </div>
+        
+          {{ form.submit (class="w-100 btn btn-lg btn-success") }}
+        </form>
+    
+    </main>
     </div>
-    <a href="{{ url_for('index') }}" class="test">Test</a>
 {% endblock %}
     
