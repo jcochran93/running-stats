@@ -29,23 +29,23 @@ class StravaActivities:
 
 class StravaStats:
     def __init__(self, activityList):
-        self.runList = activityList
-        self.dailyMilesList = self.getDailyMilesList(self.runList)
-        self.dailyDateList = self.getDailyDateList(self.runList)
+        self.runActivityList = activityList
+        self.dailyMilesList = self.getDailyMilesList(self.runActivityList)
+        self.dailyDateList = self.getDailyDateList(self.runActivityList)
                 
     def longestRunStreak(self, runActivityList):
 
-        # runList = self.runList
+        # runList = self.runActivityList
         runList = runActivityList
         
         count = 1
         maxCount = 1
-        longestStartDate = runList[0].start_date
+        longestStartDate = runList[0].start_date_local
 
         for i in range(len(runList) -1 ):
-            currDate = runList[i].start_date
+            currDate = runList[i].start_date_local
             currDate = currDate.date()
-            prevDate = runList[i+1].start_date
+            prevDate = runList[i+1].start_date_local
             prevDate = prevDate.date()
 
             dayDiff = abs((currDate - prevDate).days)
@@ -66,13 +66,13 @@ class StravaStats:
 
     def currentRunStreak(self, runActivityList):
 
-        # runList = self.runList
+        # runList = self.runActivityList
         runList = runActivityList
         
         count = 1
         for i in range(len(runList) -1 ):
-            currDate = self.toDatetime(str(runList[i].start_date))
-            prevDate = self.toDatetime(str(runList[i+1].start_date))
+            currDate = self.toDatetime(str(runList[i].start_date_local))
+            prevDate = self.toDatetime(str(runList[i+1].start_date_local))
 
             dayDiff = (currDate - prevDate).days
             if(dayDiff == 0):
@@ -85,25 +85,20 @@ class StravaStats:
                     break
         return count, longestStartDate
 
-    # def toMiles(self, distance):
-    #     dist = str(distance).strip(" meter")
-    #     dist = float(dist) / 1609.34
-    #     return dist 
-
     def getDailyMilesList(self, runActivityList, startDate=date.min, endDate=date.max):
         y = np.array([])
-        # self.runList
+        # self.runActivityList
         for run in runActivityList:
-            if (startDate <= run.start_date.date() <= endDate):
+            if (startDate <= run.start_date_local.date() <= endDate):
                 y = np.append(y, run.distance)
         return y
 
     def getDailyDateList(self, runActivityList, startDate=date.min, endDate=date.max):
         x = np.array([])
-        # self.runList
+        # self.runActivityList
         for run in runActivityList:
-            if (startDate <= run.start_date.date() <= endDate):
-                x = np.append(x, run.start_date)
+            if (startDate <= run.start_date_local.date() <= endDate):
+                x = np.append(x, run.start_date_local)
         return x
 
     def minRun(self, runList):
@@ -129,8 +124,11 @@ class StravaStats:
         
         time = 0
         for run in runList:
-            if (startDate <= run.start_date.date() <= endDate):
-                time += run.moving_time
+            if (startDate <= run.start_date_local.date() <= endDate):
+                try:
+                    time += run.moving_time
+                except:
+                    time += run.moving_time.total_seconds()
         return time
 
     def totalMiles(self, dailyMilesList):
@@ -145,7 +143,7 @@ class StravaStats:
     def averagePace(self, dailyMilesList, startDate, endDate):
         milesWithinRange = dailyMilesList
         try:
-            pace = (self.totalElapsedTimeInSeconds(self.runList, startDate, endDate ) / 60) / self.totalMiles(milesWithinRange)
+            pace = (self.totalElapsedTimeInSeconds(self.runActivityList, startDate, endDate ) / 60) / self.totalMiles(milesWithinRange)
             floorPace = math.floor(pace)
             seconds = (pace - floorPace ) * 60
         except:
@@ -157,11 +155,11 @@ class StravaStats:
         allStats = {}
 
         try:
-            milesWithinRange = self.getDailyMilesList(self.runList, startDate, endDate)
-            dailyDatesList = self.getDailyDateList(self.runList, startDate, endDate)
+            milesWithinRange = self.getDailyMilesList(self.runActivityList, startDate, endDate)
+            dailyDatesList = self.getDailyDateList(self.runActivityList, startDate, endDate)
 
             allStats["avg_pace"] = self.averagePace(milesWithinRange, startDate, endDate)
-            allStats["streak"] = self.longestRunStreak(self.runList)[0]
+            allStats["streak"] = self.longestRunStreak(self.runActivityList)[0]
             allStats["shortest"] = round(self.minRun(milesWithinRange), 2)
             allStats["longest"] = round(milesWithinRange.max(),2)
             allStats["average"] = round(np.average(milesWithinRange), 2)
@@ -173,7 +171,7 @@ class StravaStats:
 
             totaldays = (endDate - startDate).days
 
-            totalSeconds = round(self.totalElapsedTimeInSeconds(self.runList, startDate, endDate))
+            totalSeconds = round(self.totalElapsedTimeInSeconds(self.runActivityList, startDate, endDate))
             totalMinutes = round(totalSeconds / 60, 2)
             totalHours = round(totalSeconds/3600, 2)
 
@@ -193,19 +191,22 @@ class StravaStats:
     def summaryStringForRange(self, startDate, endDate):
         allstats = self.getStatsForRange(startDate, endDate)
         if (allstats == 0):
-            return ["Invalid date range."]
-        summary = []
+            return {"Error":"Invalid date range."}
+        summary = {}
 
-        summary.append( (f'The longest run streak is {allstats["streak"]}.'))
-        summary.append( (f'The shortest run: {allstats["shortest"]}'))
-        summary.append( (f'The longest run: {allstats["longest"]}'))
-        summary.append( (f'Average run: {allstats["average"]}'))
-        summary.append( (f'Median run: {allstats["median"]}'))
-        summary.append( (f'Most common distance (rounded to a mile): {allstats["mode"]} with {allstats["modeOccurance"]} runs'))
-        summary.append( (f'From {allstats["startDate"]} to {allstats["endDate"]} ({allstats["totalDays"]} total days)'))
-        summary.append( (f'You ran {allstats["totalRunningDays"]} days or {allstats["percentDays"]}% of the time.'))
-        summary.append( (f'For a total of {allstats["totalMinutes"]} minutes, or {allstats["totalHours"]} hours, or {allstats["totalOfDaysRunning"]} days'))
-        summary.append( (f'During that time you ran a total of {allstats["totalMiles"]} miles'))
-        summary.append( (f'Average pace: {allstats["avg_pace"]} min/mile'))
-        # summary += "<br>"
+        summary["Longest Run Streak"] = f'{allstats["streak"]} days'
+
+        summary["Shortest Run"] = f'{allstats["shortest"]} miles'
+        summary["Longest Run"] = f'{allstats["longest"]} miles'
+        summary["Total Miles"] = f'{allstats["totalMiles"]} miles'
+        
+        summary['Average Run'] = f'{allstats["average"]} miles'
+        summary['Median Run'] = f'{allstats["median"]} miles'
+        summary['Most common distance (rounded to a mile)']= f'{allstats["mode"]} miles {allstats["modeOccurance"]} times'
+
+        summary['Days Ran'] = f'{allstats["totalRunningDays"]} days or {allstats["percentDays"]}% of all days'
+        
+        summary['Time Spent Running'] =  (f'For a total of {allstats["totalMinutes"]} minutes, or {allstats["totalHours"]} hours, or {allstats["totalOfDaysRunning"]} days')
+        
+        summary['Average Pace'] = (f'{allstats["avg_pace"]} min/mile')
         return summary

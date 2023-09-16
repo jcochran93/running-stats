@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from dash import Dash 
+import dash_bootstrap_components as dbc
 import os
 
 is_prod = os.environ.get('PROD', None)
@@ -11,7 +12,7 @@ if is_prod:
     AUTH_URL = 'https://running-stats-d49636ca3c9f.herokuapp.com/authorization'
 else:
     SESSION_SECRET = open('session.secret').read().strip()
-    DATABASE_URL = "sqlite:///test.db"
+    DATABASE_URL = open('database.secret').read().strip()
     AUTH_URL = 'http://127.0.0.1:5000/authorization'
  
 
@@ -21,7 +22,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 
 db = SQLAlchemy(app)
 
-app_dash = Dash(__name__, server=app, url_base_pathname='/dash/')
+app_dash = Dash(__name__, server=app, url_base_pathname='/dash/',external_stylesheets=[dbc.themes.DARKLY])
+
 
 
 from RunningStats.models import UserInfo

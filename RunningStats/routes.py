@@ -128,7 +128,7 @@ def auth():
         session['refresh_token'] = token_response['refresh_token']
 
         token_info = Token(id=int(session['userId']), access_token=session['access_token'], 
-                           refresh_token=session['refresh_token'], expires_at=token_response['expires_at'])
+                           refresh_token=session['refresh_token'], expires_at=int(token_response['expires_at']))
         old_token = Token.query.filter_by(id=int(session['userId'])).first()
 
         try:
@@ -154,7 +154,7 @@ def render_dashboard():
 @app.route('/test') 
 def render_test_dash():
     # checkAuthorization()
-    # plotlyDashboard("", '')
+    plotlyDashboard("", "")
     return redirect('/dash')
 
 # def checkAuthorization():

@@ -19,7 +19,8 @@ class RunningData(db.Model):
     name = db.Column(db.String(100))
     athlete_id = db.Column(db.Integer, db.ForeignKey("user_info.id"), nullable=False)
     distance = db.Column(db.Float, nullable=False, default = 0)
-    start_date = db.Column(db.DateTime, nullable=False)
+    start_date_local = db.Column(db.DateTime, nullable=False)
     moving_time = db.Column(db.Float, nullable=False)
+    gear_id = db.Column(db.Integer, nullable=False, default=0)
 
 
