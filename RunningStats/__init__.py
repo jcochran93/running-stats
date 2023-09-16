@@ -8,7 +8,8 @@ is_prod = os.environ.get('PROD', None)
 
 if is_prod:
     SESSION_SECRET = os.getenv("SESSION_SECRET")
-    DATABASE_URL = os.getenv("DATABASE_URL")
+    # DATABASE_URL = os.getenv("DATABASE_URL")
+    DATABASE_URI = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://", 1)
     AUTH_URL = 'https://running-stats-d49636ca3c9f.herokuapp.com/authorization'
 else:
     SESSION_SECRET = open('session.secret').read().strip()
