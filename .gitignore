@@ -5,3 +5,5 @@ strava_tokens.json
 stravalib.ipynb
 venv/
 *.ipynb
+instance/
+*.db
