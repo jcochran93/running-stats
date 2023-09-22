@@ -9,7 +9,7 @@ from sqlalchemy import desc
 from datetime import datetime, timedelta, date
 from RunningStats import db
 from flask import session
-import json
+# import json
 import dash_bootstrap_components as dbc
 
 summaryStringList = []
@@ -80,7 +80,6 @@ def plotlyDashboard(accessToken, athlete):
 
         stravaRuns = StravaActivities(newClient)
         stravaRunsList = stravaRuns.getActivities(activityType="Run", afterDate=latestDate)
-        stravaRunsList = stravaRuns.getActivities(activityType="Run")
 
         stravaStats = StravaStats(stravaRunsList)
         addActivitiesToDb(stravaRunsList, newClient.get_athlete().id)

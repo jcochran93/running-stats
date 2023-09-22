@@ -7,3 +7,4 @@ venv/
 *.ipynb
 instance/
 *.db
+*.sql
