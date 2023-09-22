@@ -80,7 +80,6 @@ def plotlyDashboard(accessToken, athlete):
 
         stravaRuns = StravaActivities(newClient)
         stravaRunsList = stravaRuns.getActivities(activityType="Run", afterDate=latestDate)
-        stravaRunsList = stravaRuns.getActivities(activityType="Run")
 
         stravaStats = StravaStats(stravaRunsList)
         addActivitiesToDb(stravaRunsList, newClient.get_athlete().id)
