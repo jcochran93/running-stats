@@ -778,9 +778,6 @@ Lunch Run	70780935	8.359638112518176	2023-09-16 12:32:22	4318	0
 -- Name: running_data_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jarred
 --
 
-SELECT pg_catalog.setval('public.running_data_id_seq', 644, true);
-
-
 --
 -- Name: user_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: jarred
 --
